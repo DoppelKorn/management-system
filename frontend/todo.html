@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de-de">
+
+<head>
+  <title>To-dos</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+  <link rel="shortcut icon" href="/static/favicon.ico">
+
+  <script src="Script/todo.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <a class="navbar-brand">Kontaktverwaltung</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="kontakte.html">Kontakte</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="kalender.html">Termine</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="todo.html">To-dos</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+
+
+
+
+  <div class="container">
+    <br>
+
+    <div class="btn-group float-right" role="group">
+      <button type="button" class="btn btn-secondary" onclick="oeffnePopup('newTodoPopup.html')">neues To-do</button>
+      <button type="button" class="btn btn-secondary" onclick="oeffnePopup('newTodolistPopup.html')">neue Liste</button>
+    </div>
+
+
+      <div class="input-group col-md-5" id="todoListsDiv">
+
+      </div>
+
+      <form class="" action="index.html" method="post">
+        <table class="table table-hover" id="todosTable">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Beschreibung</th>
+              <th scope="col">Due-Date</th>
+              <th scope="col">Priorität</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody id="todosTableBody">
+
+          </tbody>
+        </table>
+      </form>
+
+
+
+    </div>
+</body>
+
+</html>

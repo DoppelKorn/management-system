@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de-de">
+<head>
+    <meta charset="UTF-8">
+    <title>Neue To-do-Liste</title>
+
+    <script src="Script/newTodolistPopup.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="shortcut icon" href="/static/favicon.ico">
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        html {
+            display: block;
+        }
+    </style>
+</head>
+<body class="text-center">
+    <form class="form-signin">
+        <h4>Neue To-do-Liste anlegen</h4>
+        <label for="newListName">Neue Liste:</label>
+        <input type="text" id="newListName" class="form-control mb-3">
+        <div class="row align-items-center">
+            <div class="col text-center">
+                <button type="button" class="btn btn-secondary btn-block" onclick="closeWindow()">Abbrechen</button>
+            </div>
+            <div class="col text-center">
+                <button type="button" class="btn btn-success btn-block" onclick="createNewList()">Erstellen</button>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

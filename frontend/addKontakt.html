@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de-de">
+
+<head>
+  <title>Kontakte Adden
+   
+  </title>
+  <script> 
+window.onload = function () {
+  document.querySelector('#addBtn').addEventListener('click', send);
+  const form = document.querySelector('form');
+
+  async function send() {
+                    const data = JSON.stringify({
+                    name : form.name.value,
+                    Vorname : form.Vorname.value,
+                    Company : form.Company.value,
+                    description: form.description.value,
+                    phone: form.phone.value,
+                    mail: form.mail.value,
+                    address: form.address.value
+  });
+
+
+                  
+                    let adress;
+                 
+                        adress = '/contacts'
+
+                    
+                    const formData = new FormData();
+                    formData.append('form', data);
+                 
+                    const response = await fetch(adress, opt = {
+                    method: 'POST',
+                    body: formData
+                });
+                window.opener.location.reload();
+           window.close()
+            }
+
+
+}
+  </script>
+  </head>
+  <body>
+
+    <form>
+        <div class="input-field"><input type="text" placeholder="Nachname" name="name" class="validate"></div>
+        <div class="input-field"><input type="text" placeholder="Vorname" name="Vorname" class="validate"></div>
+        <div class="input-field"><input type="text" placeholder="Company" name="Company" class="validate"></div>
+        <div class="input-field"><input type="text" placeholder="Phonenumber" name="phone" class="validate"></div>
+        <div class="input-field"><input type="text" placeholder="Mail" name="mail" class="validate"></div>
+        <div class="input-field"><input type="text" placeholder="Address" name="address" class="validate"></div>
+        <div class="input-field"><textarea type="text" placeholder="Beschreibung" name="description" class="validate"></textarea></div>
+    </form>
+    <input type="button" id="addBtn" class="second-button" value="Abschicken">
+  </body>
+</html>

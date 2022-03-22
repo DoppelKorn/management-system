@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="de-de">
+
+<head>
+  <title>Kontakte</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+  <link rel="shortcut icon" href="/static/favicon.ico">
+
+
+  <script> 
+window.onload = function () {
+    add=document.getElementById("AddButton");
+    
+
+    add.addEventListener('click', popup);
+
+     function popup() {
+                    const w = 450;
+                    const h = 400;
+                    const dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;  
+                    const dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;  
+                    const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+                    const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+                    const left = ((width / 2) - (w / 2)) + dualScreenLeft;  
+                    const top = ((height / 2) - (h / 2)) + dualScreenTop;  
+                    const systemZoom = width / window.screen.availWidth;
+
+                    window.open('http://localhost:3000/addKontakt','Hinzufügen',`width=350,height=400
+                        width=${w / systemZoom}, 
+                        height=${h / systemZoom}, 
+                        top=${top}, 
+                        left=${left}
+                    `);
+                    }
+                  }
+
+                  function editContact(id) {
+  
+  const w = 450;
+  const h = 400;
+  const dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;  
+  const dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;  
+  const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+  const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+  const left = ((width / 2) - (w / 2)) + dualScreenLeft;  
+  const top = ((height / 2) - (h / 2)) + dualScreenTop;  
+  const systemZoom = width / window.screen.availWidth;
+
+  window.open(`http://localhost:3000/editContact/${id}`,'Edit',`width=350,height=400
+      width=${w / systemZoom}, 
+      height=${h / systemZoom}, 
+      top=${top}, 
+      left=${left}
+  `);
+}
+  
+  var yourContacts;
+  
+  
+  window.addEventListener("load", () => {
+    getContacts();
+  });
+
+  // Fetche Daten
+  async function getContacts() {
+    let url = new URL("loadContacts", "http://localhost:3000");
+    let res = await fetch(url);  
+    let result = await res.json();
+    console.log(JSON.parse(result.contacts));
+    yourContacts = [];
+    JSON.parse(result.contacts).forEach(contact => {
+      yourContacts.push(contact);
+    });
+    display();
+  }
+
+  // Zeige Daten in Tabelle an
+  function display() {
+    const tableMain = document.querySelector("#tableBody");
+    tableMain.innerHTML = "";
+
+    yourContacts.forEach(contact => {
+    tableMain.innerHTML += 
+    `<tr>
+          <td>
+          </td>
+          <th scope="row">${contact.lastname}</th>
+          <th scope="row">${contact.firstname}</th>
+          <td>${contact.company}</td>
+          <td>${contact.description}</td>
+          <td>${contact.phone}</td>
+          <td>${contact.mail}</td>
+          <td>${contact.address}</td>
+          <td><button type="button" id="EditContact" class="btn btn-success float-right EditContact" onclick="editContact(${contact.id})">Edit</button></td>
+          <td><button type="button" id="buttonDelete" 
+            class="btn btn-danger float-right deleteContact" onclick="confirmDeletion(${contact.id})">löschen</button></td>
+     </tr>`
+    });
+    
+  }
+
+
+  async function deleteContact(id) {
+    let url = new URL(`deleteContact/${id}`, "http://localhost:3000");
+      fetch(url, {
+        method: "POST",
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+
+      getContacts();  
+  }
+
+  async function deleteAllContacts() {
+    let url = new URL(`deleteAllContacts`, "http://localhost:3000");
+      fetch(url, {
+        method: "POST",
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+      getContacts();
+  }
+  
+  async function confirmDeletion(id) {
+
+    let conf = confirm("Möchten Sie den Kontakt wirklich löschen?");
+    if(conf) {
+      console.log(id);
+      deleteContact(id);
+    }
+}
+
+
+  async function confirmDeletionAll() {
+
+    let conf = confirm("Möchten Sie wirklich alle Kontakte löschen?");
+    if(conf) {
+      deleteAllContacts();
+    }
+}
+
+  </script>
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <a class="navbar-brand">Kontaktverwaltung</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Kontakte</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="kalender.html">Termine</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="todo.html">To-dos</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container">
+    <br>
+    <div class="btn-group float-left newContact" role="group">
+      <button type="button" id="AddButton" class="btn btn-secondary">neuer Kontakt</button>
+    </div>
+
+
+    <form class="" action="index.html" method="post">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Nachname</th>
+            <th scope="col">Vorname</th>
+            <th scope="col">Firma</th>
+            <th scope="col">Bemerkungen</th>
+            <th scope="col">Telefon</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Adresse</th>
+            <td><button type="button" id="buttonDelete" 
+              class="btn btn-danger float-right deleteContacts" onclick="confirmDeletionAll()">alle löschen</button></td>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+
+        <tbody id="tableBody"></tbody>
+
+      </table>
+    </form>
+
+  </div>
+
+  <script type="text/javascript">(function(){window['__CF$cv$params']={r:'6ddf8406cbac58ea',m:'dDSxHmgmbQxgn3_ASD3AbMeEJwt536pl0UpTN958gNI-1644938379-0-AfBIwaD2r3MJh0G1LykQhn3RmO+T7Y0mutAIYcn2L/p0k+LpEJrxKB+9+KOUWq+QJEa71u8CNd1Wz+oXNT2wLA/djlcaOTv2XDxjFIs6oe0V3wWte+6hKQHUFNeDbd73H3yl+Q1QrbKwfuPn6LpS1qYYBf/5E7Tr12MqGbrd4dFgBLmCbKyuGA+h+6ZyD1Kfzy/uOoNzg87AklkJpp6sy2o=',s:[0x0e943b4826,0x2432837698],}})();</script>
+
+</body>
+
+</html>

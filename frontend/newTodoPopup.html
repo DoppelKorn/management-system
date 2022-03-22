@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de-de">
+<head>
+  <meta charset="UTF-8">
+  <title>Neue To-do Liste</title>
+
+  <script type="text/javascript" src="Script/newTodoPopup.js"></script>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+  <link rel="shortcut icon" href="/static/favicon.ico">
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    html {
+      display: block;
+    }
+  </style>
+</head>
+<body class="text-center">
+<form class="form-signin">
+  <h4>Neues To-do anlegen</h4>
+  <label for="newTodoDescription">Beschreibung:</label>
+  <input type="text" id="newTodoDescription" class="form-control" placeholder="Beschreibung">
+  <label for="dueDate">Zu erledigen bis:</label>
+  <input type="date" id="dueDate" class="form-control">
+  <label for="priority" id="priorityLabel">Priorität: 1</label>
+  <input type="range" id="priority" class="form-control-range mb-3" min="1" max="5" value="1">
+  <div class="row align-items-center">
+    <div class="col text-center">
+      <button type="button" class="btn btn-secondary btn-block" onclick="closeWindow()">Abbrechen</button>
+    </div>
+    <div class="col text-center">
+      <button type="button" class="btn btn-success btn-block" onclick="createNewTodo()">Erstellen</button>
+    </div>
+  </div>
+</form>
+</body>
+</html>

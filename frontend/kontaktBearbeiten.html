@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de-de">
+
+<head>
+  <title>Kontakte Adden
+   
+  </title>
+  <script> 
+  window.addEventListener("load", () => {
+    getData();
+  });
+
+var Values;
+
+async function send() {
+  const form = document.querySelector('form');
+const myurl = window.location.href;
+console.log(myurl);
+const lastSegment = myurl.substring(myurl.lastIndexOf("/") + 1);
+
+
+
+                const data = JSON.stringify({
+                name : form.name.value,
+                Vorname : form.Vorname.value,
+                Company : form.Company.value,
+                description: form.description.value,
+                phone: form.phone.value,
+                mail: form.mail.value,
+                address: form.address.value,
+                id: lastSegment
+});
+
+                let adress;
+             
+                    adress = '/ContactEdited'
+                
+                const formData = new FormData();
+                formData.append('form', data);
+             
+                const response = await fetch(adress, opt = {
+                method: 'PUT',
+                body: formData
+            });
+            window.opener.location.reload();
+            window.close()
+        }
+
+
+  // Fetche Daten
+  async function getData() {
+
+    const myurl = window.location.href;
+    console.log(myurl);
+  const lastSegment = myurl.substring(myurl.lastIndexOf("/") + 1);
+
+    console.log(lastSegment);
+
+
+
+    let url = new URL("/loadContactToEdit/"+lastSegment, "http://localhost:3000");
+    console.log(url)
+    let res = await fetch(url);  
+    let result = await res.json();
+    console.log(JSON.parse(result.contacts));
+    Values = [];
+    JSON.parse(result.contacts).forEach(contact => {
+      Values.push(contact);
+    });
+    display();
+  }
+
+  // Zeige Daten an
+  function display() {
+    const MainBody = document.querySelector("#Main");
+
+    Values.forEach(contact => {
+      MainBody.innerHTML += 
+    `    
+    <form>
+      <label>Nachname</label>
+        <div class="input-field"><input type="text" placeholder="Nachname" value="${contact.lastname}" name="name" class="validate"></div>
+        <label>Vorname</label>
+        <div class="input-field"><input type="text" placeholder="Vorname" value="${contact.firstname}" name="Vorname" class="validate"></div>
+        <label>Firma</label>
+        <div class="input-field"><input type="text" placeholder="Company" value="${contact.company}" name="Company" class="validate"></div>
+        <label>Telefon</label>
+        <div class="input-field"><input type="text" placeholder="Phonenumber" value="${contact.phone}"  name="phone" class="validate"></div>
+        <label>Mail</label>
+        <div class="input-field"><input type="text" placeholder="Mail" name="mail" value="${contact.mail}" class="validate"></div>
+        <label>Adresse</label>
+        <div class="input-field"><input type="text" placeholder="Address" name="address" value="${contact.address}" class="validate"></div>
+        <label>Bemerkung</label>
+        <div class="input-field"><input type="text" placeholder="Beschreibung" name="description" value="${contact.description}" class="validate"></input></div>
+     
+    </form>
+    <input type="button" id="editBtn" class="second-button" value="Abschicken" onclick="send()">
+    `
+    });
+    
+
+
+
+  }
+
+
+
+
+
+  </script>
+  </head>
+  <body >
+    <div id="Main">
+
+   
+    </div>
+
+   
+    
+  </body>
+</html>

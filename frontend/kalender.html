@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="de-de">
+
+<head>
+  <title>Termine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <!-- calendar picker -->
+  <link rel="stylesheet" href="./CalendarPickerJS/CalendarPicker.style.css">
+
+  <style>
+    #myCalendarWrapper {
+      width: 60em;
+      border: 5px;
+    }
+
+    #editEntry{
+      display: none;
+      border: solid 2px grey;
+      box-shadow: grey 2px 2px ;
+      width: 50%;
+      margin-top: 10px;
+    }
+
+    #editForm{
+      margin: 10px 10px 10px;
+    }
+
+    #saveEditButton{
+      background-color: #80ff80;
+    }
+
+    #cancelEditButton{
+      background-color: #ff8080;
+      float: right;
+    }
+
+    #showAllEntrys, #newEntry{
+      float: right;
+      margin-left: 5px;
+    }
+
+    .editInput{
+      float: right;
+      margin: 5px 5px 5px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <a class="navbar-brand">Kontaktverwaltung</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="kontakte.html">Kontakte</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Termine</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="todo.html">To-dos</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div id="showcase-wrapper">
+          <div id="myCalendarWrapper"></div>
+        </div>
+
+        <button onclick="createTableFilter(entries, true, null);" id="showAllEntrys">Alle Einträge Anzeigen 📖</button>
+        <button onclick="toggleNewEntry();" id="newEntry">Neuen Eintrag hinzufügen 💾</button>
+        <br><br>
+      </div>
+
+      <div class="col-sm">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Beschreibung</th>
+                <th scope="col">Uhrzeit</th>
+                <th scope="col">Eingeladene Personen</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+          </table>
+      </div>
+    </div>
+
+    <div id="editEntry">
+      <div id="editForm">
+        <h1 id="editHeader">Eintrag bearbeiten</h1>
+        <fieldset>
+          <label>Beschreibung:</label><input type="text" id="editDescription" class="editInput">
+        </fieldset>
+        <hr>
+        <fieldset>
+          <label>Uhrzeit:</label><input type="time" id="editTimeEnd" class="editInput"><label class="editInput"> - </label> <input type="time" id="editTimeStart" class="editInput">
+        </fieldset>
+        <hr>
+        <fieldset>
+          <label>Datum:</label><input type="date" id="editDate" class="editInput">
+        </fieldset>
+        <hr>
+        <fieldset>
+          <label>Eingeladene Personen:</label><input type="text" id="editPersons" class="editInput">
+        </fieldset>
+
+        <fieldset>
+          <label style="display: none">Id:<span id="editEntryId"></span></label>
+          <label style="display: none">Row:<span id="row"></span></label>
+          <label style="display: none; color: red" id="warning">Warning</label>
+        </fieldset>
+        <hr>
+        <button onclick="saveEditEntry()" id="saveEditButton">Speichern 💾</button>
+        <button onclick="toggleEdit()" id="cancelEditButton">Abbrechen ❌</button>
+      </div>
+    </div>
+    <br>
+  </div>
+
+  <script src="./CalendarPickerJS/CalendarPicker.js"></script>
+  <script>
+    let entries;
+
+    window.addEventListener('DOMContentLoaded', function() {
+      const nextYear = new Date().getFullYear() + 1;
+      const myCalender = new CalendarPicker('#myCalendarWrapper', {
+        min: new Date(),
+        max: new Date(nextYear, 10)
+      });
+
+      let currentDateElement = myCalender.value;
+      let currentDayElement = myCalender.value.getDay();
+      let currentToDateString = myCalender.value.toDateString();
+
+      myCalender.onValueChange((currentValue) => {
+        currentDateElement.textContent = currentValue;
+        currentDayElement.textContent = currentValue.getDay();
+        currentToDateString.textContent = currentValue.toDateString();
+        let date = currentValue.toDateString().split(" ")[3] + "-" + currentValue.toDateString().split(" ")[2] + "-" + monthPicker(currentValue.toDateString().split(" ")[1]);
+        console.log(date);
+        createTableFilter(entries, false, date);
+      });
+
+      let date = currentToDateString.split(" ")[3] + "-" + currentToDateString.split(" ")[2] + "-" + monthPicker(currentToDateString.split(" ")[1]);
+      createTableFilter(loadData(), false, date);
+    });
+
+
+    /** Wandelt Monatskürzel in Zahl um
+     *
+     * @return {string}
+     */
+    function monthPicker(month) {
+      switch(month) {
+        case "Jan":
+          return "01";
+        case "Feb":
+          return "02";
+        case "Mar":
+          return "03";
+        case "Apr":
+          return "04";
+        case "May":
+          return "05";
+        case "Jun":
+          return "06";
+        case "Jul":
+          return "07";
+        case "Aug":
+          return "08";
+        case "Sep":
+          return "09";
+        case "Oct":
+          return "10";
+        case "Nov":
+          return "11";
+        case "Dec":
+          return "12";
+        default:
+          break;
+      }
+    }
+
+
+    /** Holt die Einträge vom Backend und gibt diese in einem Array zurück
+     *
+     * @return {Array} entries - Array mit allen verfügbaren Einträgen
+     */
+    function loadData(){
+      let request = new XMLHttpRequest();
+      request.open( "GET", "http://localhost:3000/calendarLoad", false); // false for synchronous request
+      request.addEventListener('load', function(event) {
+        if (request.status >= 200 && request.status < 300) {
+          console.log("Loaded Entries");
+          entries = JSON.parse(request.responseText);
+          console.log(entries);
+        } else {
+          console.warn(request.statusText, request.responseText);
+        }
+      });
+      request.send(null);
+      return entries;
+    }
+
+
+    /**
+     * Prüft ob nur Einträge mit einem bestimmten Datum angezeigt werden sollen und filtert das übergeben Array
+     * nach allen Einträgen, welche dem übergenen Datum entsprechen. Wenn nicht gefiltert werden soll, wird das übergebene
+     * Array zunächst chronologisch gefiltert und dann weitergegeben.
+     *
+     * @param {Array} data      - Ein Array mit Json-Einträge für jeden Eintrag aus der Datenbank
+     * @param {boolean} showAll - gibt an, ob alle Einträge angeziegt werden sollen
+     * @param {string} date     - gibt das zu filternde Datum an
+     * @return {function} createTable() - erstellt mit den bekommenen Daten eine HTML-Tabelle
+     */
+    function createTableFilter(data, showAll, date) {
+      let sortedEntries;
+
+      if(showAll === false){
+        let filteredData = [];
+        for (let i = 0; i < data.length; i++) {
+          let splitDate = data[i].date.split("T")[0];
+          let formatedDate =  splitDate.split("-")[0]+ "-" + ("0" + (parseInt(splitDate.split("-")[2]))).slice(-2) + "-" + ("0" + splitDate.split("-")[1]).slice(-2);
+          if(formatedDate === date)
+          {
+            filteredData.push(data[i])
+          }
+        }
+        return createTable(filteredData);
+      }else{
+        sortedEntries = sortItems(data);
+        return createTable(sortedEntries);
+      }
+    }
+
+
+    /**
+     * Entfernt zuerst alle aktuellen Einträge aus der Tabelle und erstellt anschließend für jeden Eintrag im übergeben bekommenen Array, einen Eintrag in der Tabelle
+     *
+     * @param {Array} data - Ein Array mit Json Einträgen
+     */
+    function createTable(data) {
+      let table = document.getElementById("tableBody");
+
+      //löscht alle bisher vorhandenen Einträge
+      while(table.firstChild){
+        table.removeChild(table.lastChild);
+      }
+
+      for (let i = 0; i < data.length; i++) {
+        let newTableRow = document.createElement("tr");
+        newTableRow.id = "row" + i;
+
+        let idTd = document.createElement("td");
+        idTd.id = String(i);
+        idTd.innerHTML = data[i].id;
+        idTd.style.display = "none";
+
+        let operationsTd = document.createElement("td");
+
+        let editButton = document.createElement("button");
+        editButton.innerHTML = "Bearbeiten ✏";
+        editButton.setAttribute("onClick", `toggleEdit(${i},true);`);
+
+        let deleteButton = document.createElement("button");
+        deleteButton.innerHTML = "Löschen ❌";
+        deleteButton.style.marginLeft = "6px";
+        deleteButton.style.backgroundColor = "#ff8080";
+        deleteButton.setAttribute("onClick", `deleteEntry(${data[i].id});`);
+
+        let descriptionTd = document.createElement("td");
+        descriptionTd.id = i + ".1";
+        descriptionTd.innerHTML = data[i].description;
+
+        let timeTd = document.createElement("td");
+        timeTd.id = i + ".2";
+        let date = data[i].date.split("T")[0];
+        timeTd.innerHTML = data[i].startTime + " - " + data[i].endTime + "<br>↳" + date.split("-")[0]+ "-" + ("0" + (parseInt(date.split("-")[2]))).slice(-2) + "-" + ("0" + date.split("-")[1]).slice(-2);
+
+        let personsTd = document.createElement("td");
+        personsTd.id = i + ".3";
+        personsTd.innerHTML =  data[i].invitedusers.split(",");
+
+        table.appendChild(newTableRow);
+
+        newTableRow.appendChild(operationsTd);
+        operationsTd.appendChild(editButton);
+        operationsTd.appendChild(deleteButton);
+
+        newTableRow.appendChild(descriptionTd);
+        newTableRow.appendChild(timeTd);
+        newTableRow.appendChild(personsTd);
+        newTableRow.appendChild(idTd);
+      }
+    }
+
+
+    /**
+     * Wenn das Fenster zum bearbeiten bereits angeziegt wird, soll die Anzeige unterdrückt werden.
+     * Wenn es nicht angezeigt wird, soll es sichtbar werden und die Werte aus dem zu bearbeitenden Eintrag
+     * in das neue Fenster übernehmen.
+     *
+     * @param {int} rowNumber    - Zeilennummer, welche gerade bearbeitet wird
+     * @param {boolean} override - Gibt an, ob bereits ein Fenster geöffnet ist und die Daten in diesem überschrieben werden sollen
+     */
+    function toggleEdit(rowNumber, override) {
+      if(document.getElementById("editEntry").style.display === "block" && !override /*&& document.getElementById("editEntryId").innerText === document.getElementById(rowNumber).innerText*/){
+        document.getElementById("editEntry").style.display = "none";
+        //document.getElementById("editHeader").innerText = "Eintrag bearbeiten";
+      }else{
+        document.getElementById("editEntry").style.display = "block";
+        document.getElementById("editDescription").value = document.getElementById(rowNumber + ".1").innerText;
+        let time = document.getElementById(rowNumber + ".2").innerText.split("\n↳")[0];
+        document.getElementById("editTimeStart").value = time.split(" - ")[0];
+        document.getElementById("editTimeEnd").value = time.split(" - ")[1];
+        let date = document.getElementById(rowNumber + ".2").innerText.split("\n↳")[1];
+        document.getElementById("editDate").value = date.split("-")[0] + "-" + date.split("-")[2] + "-" + date.split("-")[1];
+        document.getElementById("editPersons").value = document.getElementById(rowNumber + ".3").innerText;
+        document.getElementById("editEntryId").innerText = document.getElementById(rowNumber).innerText;
+        document.getElementById("row").innerText = rowNumber;
+        document.getElementById("editHeader").innerText = "Eintrag bearbeiten";
+        document.getElementById("saveEditButton").onclick = saveEditEntry;
+        window.scrollTo(0,document.body.scrollHeight);
+
+        console.log("Du bearbeitest den Eintrag mit der ID:" +  document.getElementById(rowNumber).innerText);
+      }
+    }
+
+
+    /**
+     *  Fasst die bearbeiteten Daten im JSON zusammen und sendet dieses JSON ans Backend.
+     *  Wenn diese zusendung erfolgreich war, wird die HTML-Tabelle erneut geladen, um den bearbeiteten
+     *  Eintrag direkt korrekt anzuzeigen.
+     */
+    function saveEditEntry() {
+      let newDescription = document.getElementById("editDescription").value;
+      let newTimeStart = document.getElementById("editTimeStart").value;
+      let newTimeEnd = document.getElementById("editTimeEnd").value;
+      let newPersons = document.getElementById("editPersons").value;
+      let id = document.getElementById("editEntryId").innerText;
+      let date = document.getElementById("editDate").value;
+      let dateSqlFormat = date.split("-")[0] + "-" + ("0" + date.split("-")[1]).slice(-2) + "-" + ("0" + date.split("-")[2]).slice(-2);
+
+        let data = {
+          "description": newDescription,
+          "startTime": newTimeStart,
+          "endTime": newTimeEnd,
+          "invitedusers": newPersons,
+          "date": dateSqlFormat,
+          "id": id
+        };
+
+        let request = new XMLHttpRequest();
+        request.open("POST", "http://localhost:3000/calendarUpdate", false);
+        request.addEventListener('load', function (event) {
+          if (request.status >= 200 && request.status < 300) {
+            console.log("Updated Entry with id " + id);
+            createTableFilter(loadData(), true, null);
+          } else {
+            console.warn(request.statusText, request.responseText);
+          }
+        });
+        request.send(JSON.stringify(data));
+
+        document.getElementById("editEntry").style.display = "none";
+        document.getElementById("warning").style.display = "none";
+    }
+
+
+    /**
+     * Bereitet das eigentliche Bearbeitungsfenster in ein Fenster, zum erstellen von neuen Einträgen, um
+     */
+    function toggleNewEntry() {
+        document.getElementById("editEntry").style.display = "block";
+        document.getElementById("editHeader").innerText = "Neuen Eintrag anlegen";
+        document.getElementById("editDescription").value = null;
+        document.getElementById("editTimeStart").value = null;
+        document.getElementById("editTimeEnd").value = null;
+        document.getElementById("editDate").value = null;
+        document.getElementById("editPersons").value = null;
+        document.getElementById("saveEditButton").onclick = saveNewEntry;
+        window.scrollTo(0,document.body.scrollHeight);
+    }
+
+
+    /**
+     * Sendet die Daten des zu erstellenden Eintrages an das Backend. Wenn dies erfolgreich war,
+     * wird die HTML-Tabelle erneut geladen um den neuen Eintrag direkt anzuzeigen.
+     */
+    function saveNewEntry(){
+      let newDescription = document.getElementById("editDescription").value;
+      let newTimeStart = document.getElementById("editTimeStart").value;
+      let newTimeEnd = document.getElementById("editTimeEnd").value;
+      let newPersons = document.getElementById("editPersons").value;
+      let date = document.getElementById("editDate").value;
+      let dateSqlFormat = date.split("-")[0] + "-" + ("0" + date.split("-")[1]).slice(-2) + "-" + ("0" + date.split("-")[2]).slice(-2);
+
+      let data = {
+        "description": newDescription,
+        "startTime": newTimeStart,
+        "endTime": newTimeEnd,
+        "invitedusers": newPersons,
+        "date": dateSqlFormat,
+      };
+
+      let request = new XMLHttpRequest();
+      request.open("POST", "http://localhost:3000/calendarInsert", false); // false for synchronous request
+      request.addEventListener('load', function (event) {
+        if (request.status >= 200 && request.status < 300) {
+          createTableFilter(loadData(), true, null);
+        } else {
+          console.warn(request.statusText, request.responseText);
+        }
+      });
+      request.send(JSON.stringify(data));
+      document.getElementById("editEntry").style.display = "none";
+      document.getElementById("warning").style.display = "none";
+    }
+
+
+    /**
+     * Sendet die ID eines zu löschenden Eintrages an das Backend.
+     * Anschließend wird die HTML-Tabelle erneut geladen, um diese
+     * direkt korrekt anzuzeigen
+     *
+     * @param {int} id - id, welche gelöscht werden soll
+     */
+    function deleteEntry(id){
+      let request = new XMLHttpRequest();
+      request.open( "POST", "http://localhost:3000/calendarDelete", false); // false for synchronous request
+      request.addEventListener('load', function(event) {
+        if (request.status >= 200 && request.status < 300) {
+          console.log("Entry with id" + id + "deleted");
+          console.log(request.responseText);
+        } else {
+          console.warn(request.statusText, request.responseText);
+        }
+      });
+      request.send(id);
+      console.log("Delete Entry with id: " + id);
+      createTableFilter(loadData(), true);
+    }
+
+
+    /**
+     * Bubblesort Algorithmus
+     *
+     * @param data - die zu sortiernden Daten
+     * @returns {*} - sortierte Daten
+     */
+    function sortItems(data) {
+      for (let i = 0; i < data.length; i++) {
+        for (let j = 0; j < data.length-1; j++) {
+          if (data[j].date > data[j + 1].date) {
+            let temp = data[j];
+            data[j] = data[j + 1];
+            data[j + 1] = temp;
+          }
+        }
+      }
+      return data;
+    }
+
+  </script>
+</body>
+
+</html>
