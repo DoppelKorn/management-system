@@ -17,10 +17,10 @@ app.use(express.static(path.join(__dirname,'..', 'frontend')));
 //zugriffsdaten für die Datenbank
 let con = mysql.createConnection({
     connectionLimit: 100,
-    host: "dlrg-sl.de",
-    user: "sweng_1",
-    password: "kfNV0gjO1yvzK44W",
-    database: "sweng_1",
+    host: "",
+    user: "",
+    password: "",
+    database: "",
     dateStrings: true
 });
 
